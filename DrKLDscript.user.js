@@ -1,24 +1,14 @@
 // ==UserScript==
-// @name         Dr Ahmed Khaled 👑 | Activated Version
+// @name         Dr Ahmed Khaled | Activated Version
 // @namespace    familyfarm.script.activated
 // @version      2.3
-// @description  Family Farm Script with Activation 👑
+// @description  Family Farm Script with Activation
 // @author       FF Script Team
-// @match        *.centurygames.com/*
-// @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js
-// @require      https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js
-// @grant        unsafeWindow
+// @match        *://*.centurygames.com/*
 // @grant        GM_xmlhttpRequest
-// @grant        GM_setClipboard
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @connect      raw.githubusercontent.com
-// @connect      *.supabase.co
-
-// 🔴 مهم جدًا: خلي التحديث من GitHub بتاعك
-// @updateURL    https://raw.githubusercontent.com/Ahmed55899/DrKLDscript/main/DrKLDscript.user.js
-// @downloadURL  https://raw.githubusercontent.com/Ahmed55899/DrKLDscript/main/DrKLDscript.user.js
-
 // @run-at       document-end
 // ==/UserScript==
 
