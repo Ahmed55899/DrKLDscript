@@ -2,11 +2,11 @@
 // @name         Dr Ahmed Khaled 👑 | Activated Version
 // @namespace    familyfarm.script.activated
 // @version      2.3
-// @description  Family Farm Script with Serial Activation 👑
+// @description  Family Farm Script with Activation 👑
 // @author       FF Script Team
 // @match        *.centurygames.com/*
 // @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js
-// @require      https://unpkg.com/@supabase/supabase-js
+// @require      https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
@@ -15,7 +15,7 @@
 // @connect      raw.githubusercontent.com
 // @connect      *.supabase.co
 
-// 🔴 مهم جدًا – دول سبب حل المشكلة
+// 🔴 مهم جدًا: خلي التحديث من GitHub بتاعك
 // @updateURL    https://raw.githubusercontent.com/Ahmed55899/DrKLDscript/main/DrKLDscript.user.js
 // @downloadURL  https://raw.githubusercontent.com/Ahmed55899/DrKLDscript/main/DrKLDscript.user.js
 
@@ -24,50 +24,22 @@
 
 
 /* =====================================================
-   🔐 ACTIVATION SYSTEM (ONCE)
+   🔐 ACTIVATION (SIMPLE & STABLE)
    ===================================================== */
-(async function () {
+(function () {
+    const KEY = "FF-PAID-2025"; // غيره براحتك أو بعدين نخليه Tokens
 
-    const LICENSE_URL = "https://raw.githubusercontent.com/Ahmed55899/ff-license/main/licenses.json";
+    const activated = GM_getValue("ff_activated");
+    if (activated === true) return;
 
-    function getDeviceID() {
-        return btoa(navigator.userAgent + screen.width + screen.height);
-    }
-
-    async function checkLicense() {
-        const savedSerial = GM_getValue("ff_serial");
-        const savedDevice = GM_getValue("ff_device");
-        const currentDevice = getDeviceID();
-
-        // ✔️ متفعل قبل كده
-        if (savedSerial && savedDevice === currentDevice) return true;
-
-        let serial = prompt("🔑 أدخل كود التفعيل:");
-        if (!serial) return false;
-
-        const res = await fetch(LICENSE_URL, { cache: "no-store" });
-        const licenses = await res.json();
-
-        if (!licenses[serial]) {
-            alert("❌ كود التفعيل غير صحيح");
-            return false;
-        }
-
-        if (new Date(licenses[serial].expire) < new Date()) {
-            alert("⌛ انتهت مدة التفعيل");
-            return false;
-        }
-
-        GM_setValue("ff_serial", serial);
-        GM_setValue("ff_device", currentDevice);
-        alert("✅ تم تفعيل السكريبت بنجاح 👑");
-        return true;
-    }
-
-    if (!(await checkLicense())) {
+    const input = prompt("🔑 أدخل كود التفعيل:");
+    if (input !== KEY) {
+        alert("❌ كود التفعيل غير صحيح");
         throw new Error("Not activated");
     }
 
+    GM_setValue("ff_activated", true);
+    alert("✅ تم تفعيل السكريبت بنجاح 👑");
 })();
 
 
