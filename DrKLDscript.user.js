@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Dr Ahmed Khaled 👑 | Activated Version
 // @namespace    familyfarm.script.activated
-// @version      2.3
-// @description  Family Farm Script with Activation 👑
+// @version      3.0
+// @description  Family Farm Script with Advanced Activation 👑
 // @author       FF Script Team
 // @match        *.centurygames.com/*
 // @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js
@@ -21,31 +21,75 @@
 
 
 /* =====================================================
-   🔐 ACTIVATION (SAFE – DOES NOT BREAK SCRIPT)
+   🔐 ADVANCED ACTIVATION SYSTEM (SAFE)
    ===================================================== */
-(function () {
-    const KEY = "FF-PAID-2025"; // ← غيره وقت ما تحب
+(async function () {
+
+    const TOKENS_URL =
+        "https://raw.githubusercontent.com/Ahmed55899/DrKLDscript/main/tokens.json";
+
+    function getDeviceID() {
+        return btoa(
+            navigator.userAgent +
+            "|" +
+            screen.width +
+            "x" +
+            screen.height
+        );
+    }
 
     try {
-        const activated = GM_getValue("ff_activated");
+        const deviceID   = getDeviceID();
+        const savedDev   = GM_getValue("ff_device");
+        const savedToken = GM_getValue("ff_token");
 
-        // ✔️ لو متفعل قبل كده سيب السكريبت يكمل
-        if (activated === true) return;
-
-        const input = prompt("🔑 أدخل كود التفعيل:");
-        if (input !== KEY) {
-            alert("❌ كود التفعيل غير صحيح");
-            // ❗ مهم: منوقفش السكريبت
-            GM_setValue("ff_blocked", true);
+        // ✔️ متفعل قبل كده على نفس الجهاز
+        if (savedDev === deviceID && savedToken) {
             return;
         }
 
-        GM_setValue("ff_activated", true);
+        const res = await fetch(TOKENS_URL, { cache: "no-store" });
+        const data = await res.json();
+
+        // ⛔ Kill Switch
+        if (!data.GLOBAL || data.GLOBAL.enabled !== true) {
+            alert("⛔ السكريبت متوقف مؤقتًا");
+            return;
+        }
+
+        const token = prompt("🔑 أدخل كود التفعيل:");
+        if (!token) {
+            alert("❌ لم يتم إدخال كود تفعيل");
+            return;
+        }
+
+        const tokenData = data.TOKENS[token];
+        if (!tokenData) {
+            alert("❌ كود غير صحيح");
+            return;
+        }
+
+        if (tokenData.used === true) {
+            alert("❌ الكود مستخدم من قبل");
+            return;
+        }
+
+        const expireDate = new Date(tokenData.expire);
+        if (expireDate < new Date()) {
+            alert("⌛ انتهت مدة التفعيل");
+            return;
+        }
+
+        // ✔️ حفظ التفعيل
+        GM_setValue("ff_device", deviceID);
+        GM_setValue("ff_token", token);
+
         alert("✅ تم تفعيل السكريبت بنجاح 👑");
 
     } catch (e) {
         console.error("Activation error:", e);
     }
+
 })();
 
 
