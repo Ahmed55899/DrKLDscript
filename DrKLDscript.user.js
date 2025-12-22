@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Dr Ahmed Khaled 👑 | Activated Version
 // @namespace    familyfarm.script.activated
-// @version      3.1
-// @description  Family Farm Script with Secure Token Activation 👑
+// @version      3.2
+// @description  Family Farm Script with Forced Token Check 👑
 // @author       FF Script Team
 // @match        *.centurygames.com/*
 // @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js
@@ -21,7 +21,7 @@
 
 
 /* =====================================================
-   🔐 TOKEN ACTIVATION (MANDATORY – BLOCKS SCRIPT)
+   🔐 FORCED TOKEN CHECK (EVERY PAGE LOAD)
    ===================================================== */
 (async function () {
 
@@ -39,43 +39,61 @@
     }
 
     try {
-        const deviceID = getDeviceID();
-        const savedDevice = GM_getValue("ff_device");
-        const savedToken  = GM_getValue("ff_token");
+        const deviceID   = getDeviceID();
+        const savedDev   = GM_getValue("ff_device");
+        const savedToken = GM_getValue("ff_token");
 
-        // ✅ مفعل سابقًا على نفس الجهاز
-        if (savedDevice === deviceID && savedToken) {
+        // لازم يكون فيه توكن محفوظ
+        if (!savedToken || !savedDev) {
+            unsafeWindow.__FF_ACTIVATED__ = false;
+        } else {
+            // فحص إجباري من GitHub كل مرة
+            const res = await fetch(TOKENS_URL, { cache: "no-store" });
+            const tokens = await res.json();
+
+            // التوكن اتحذف أو اتوقف
+            if (!tokens[savedToken] || tokens[savedToken].used === true) {
+                alert("⛔ تم إيقاف تفعيل السكريبت");
+                GM_setValue("ff_device", null);
+                GM_setValue("ff_token", null);
+                unsafeWindow.__FF_ACTIVATED__ = false;
+                return;
+            }
+
+            // الجهاز مختلف
+            if (savedDev !== deviceID) {
+                alert("❌ التفعيل مربوط بجهاز آخر");
+                unsafeWindow.__FF_ACTIVATED__ = false;
+                return;
+            }
+
+            // ✔️ كل شيء سليم
             unsafeWindow.__FF_ACTIVATED__ = true;
             return;
         }
 
+        /* 🔑 طلب تفعيل جديد */
         const res = await fetch(TOKENS_URL, { cache: "no-store" });
         const tokens = await res.json();
 
         const token = prompt("🔑 أدخل كود التفعيل:");
-        if (!token) {
-            alert("❌ لم يتم إدخال كود تفعيل");
-            unsafeWindow.__FF_ACTIVATED__ = false;
-            return;
-        }
+        if (!token) return;
 
         if (!tokens[token]) {
             alert("❌ كود غير صحيح");
-            unsafeWindow.__FF_ACTIVATED__ = false;
             return;
         }
 
         if (tokens[token].used === true) {
-            alert("❌ الكود مستخدم من قبل");
-            unsafeWindow.__FF_ACTIVATED__ = false;
+            alert("❌ الكود مستخدم / موقوف");
             return;
         }
 
-        // ✅ حفظ التفعيل
+        // حفظ التفعيل
         GM_setValue("ff_device", deviceID);
         GM_setValue("ff_token", token);
-
         unsafeWindow.__FF_ACTIVATED__ = true;
+
         alert("✅ تم تفعيل السكريبت بنجاح 👑");
 
     } catch (e) {
@@ -134,10 +152,4 @@
             'تعذّر تحميل الملف من GitHub!\n',
             'https://raw.githubusercontent.com/AhmedKhaled2132003/DrKhaldall/main/DrKhaldall.json',
             '3041142bfaPZz','message','trim','1625480FthlWd','3EMyXHh',
-            'startsWith','5KjkZXU','876NpYSoI'
-        ];
-        a=function(){return l;};
-        return a();}
-    }
-
-})();
+            'startsWith','5KjkZXU',
